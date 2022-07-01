@@ -118,12 +118,16 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AppDisplayName" xml:space="preserve">
-    <value>Esme</value>
-    <comment>Application display name</comment>
+    <value>Esmerelda</value>
   </data>
   <data name="AppDescription" xml:space="preserve">
-    <value>Esme</value>
-    <comment>Application description</comment>
+    <value>Esmerelda; the most complex and widely open-source artificially intelligent being to be on Windows.</value>
+  </data>
+  <data name="ShellMenuBarItem_File.Title" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="ShellMenuItem_File_Exit.Text" xml:space="preserve">
+    <value>Exit</value>
   </data>
   <data name="Main_Title.Text" xml:space="preserve">
     <value>Main</value>
@@ -133,103 +137,44 @@
     <value>Intelligence</value>
     <comment>Page title for IntelligencePage</comment>
   </data>
-  <data name="Map_YourLocation" xml:space="preserve">
-    <value>Your location</value>
-    <comment>Your location text on map page</comment>
+  <data name="Settings_Personalization.Text" xml:space="preserve">
+    <value>Personalization</value>
   </data>
   <data name="Settings_Theme.Text" xml:space="preserve">
-    <value>Choose Theme</value>
-    <comment>Choose theme text for Settings</comment>
-  </data>
-  <data name="Settings_Theme_Dark.Content" xml:space="preserve">
-    <value>Dark</value>
-    <comment>Dark theme text for Settings</comment>
-  </data>
-  <data name="Settings_Theme_Default.Content" xml:space="preserve">
-    <value>Windows default</value>
-    <comment>Windows default theme text for Settings</comment>
+    <value>Theme</value>
   </data>
   <data name="Settings_Theme_Light.Content" xml:space="preserve">
     <value>Light</value>
-    <comment>Light theme text for Settings</comment>
   </data>
-  <data name="Settings_About.Text" xml:space="preserve">    
+  <data name="Settings_Theme_Dark.Content" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="Settings_Theme_Default.Content" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="Settings_About.Text" xml:space="preserve">
     <value>About this application</value>
-    <comment>About this application title for Settings</comment>
   </data>
-  <data name="Settings_AboutDescription.Text" xml:space="preserve">    
-    <value>Settings page placeholder text.  Your app description goes here.</value>
-    <comment>About this application description for Settings</comment>
+  <data name="Settings_AboutDescription.Text" xml:space="preserve">
+    <value>Esmerelda; the most complex and widely open-source artificially intelligent being to be on Windows.</value>
   </data>
-  <data name="Settings_PrivacyTermsLink.Content" xml:space="preserve">    
+  <data name="SettingsPage_PrivacyTermsLink.Content" xml:space="preserve">
     <value>Privacy Statement</value>
-    <comment>Privacy Statement link content for Settings</comment>
   </data>
-  <data name="Settings_PrivacyTermsLink.NavigateUri" xml:space="preserve">  
+  <data name="SettingsPage_PrivacyTermsLink.NavigateUri" xml:space="preserve">
     <value>https://YourPrivacyUrlGoesHere/</value>
-    <comment>Here is your Privacy Statement url for Settings</comment>
   </data>
-  <data name="Settings_Personalization.Text" xml:space="preserve">   
-    <value>Personalization</value>
-    <comment>Personalization text for Settings</comment>
+  <data name="ShellMenuBarSettingsButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Settings</value>
   </data>
   <data name="Settings_Title.Text" xml:space="preserve">
     <value>Settings</value>
     <comment>Page title for SettingsPage</comment>
   </data>
-  <data name="SchemeActivationSamplePage_Title.Text" xml:space="preserve">
-    <value>SchemeActivationSample</value>
-    <comment>Page Title for URI Scheme Example</comment>
+  <data name="ShellMenuItem_File_Home.Text" xml:space="preserve">
+    <value>Home</value>
   </data>
-  <data name="SchemeActivationSamplePage_Description.Text" xml:space="preserve">
-    <value>This is a sample page that will show activation parameters if the app is activated from Deep Linking.</value>
-    <comment>Description text for SchemeActivationSamplePage</comment>
-  </data>
-  <data name="WhatsNew_Body.Text" xml:space="preserve">
-    <value>Replace the content of this dialog with whatever content is appropriate to your app.
-You might want to consider lists of bug fixes and new features.
-Don't feel restricted to just text. You can also include images and animations if you wish too.
-
-Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna.
-Nunc viverra imperdiet enim. Fusce est. Vivamus a tellus.
-Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci.
-Suspendisse dui purus, scelerisque at, vulputate vitae, pretium mattis, nunc. Mauris eget neque at sem venenatis eleifend. Ut nonummy.</value>
-    <comment>What's new prompt message body</comment>
-  </data>
-  <data name="WhatsNewDialog.Title" xml:space="preserve">
-    <value>What's new in this version</value>
-    <comment>What's new prompt message title</comment>
-  </data>
-  <data name="WhatsNewDialog.PrimaryButtonText" xml:space="preserve">
-    <value>Ok</value>
-    <comment>What's new prompt message primary button text</comment>
-  </data>
-  <data name="LogInPageTitle.Text" xml:space="preserve">
-    <value>LogIn</value>
-    <comment>Title for LogIn page</comment>
-  </data>
-  <data name="LogInButton.Content" xml:space="preserve">
-    <value>Click to log in</value>
-    <comment>LogIn Button content in LogIn page</comment>
-  </data>
-  <data name="StatusUnauthorized" xml:space="preserve">
-    <value>User is unauthorized</value>
-    <comment>Status message for unauthorized login result</comment>
-  </data>
-  <data name="StatusNoNetworkAvailable" xml:space="preserve">
-    <value>There is no internet connection, please connect to the internet and try again.</value>
-    <comment>Status message for no network login result</comment>
-  </data>
-  <data name="StatusLoginFails" xml:space="preserve">
-    <value>Something went wrong during the login, please try again.</value>
-    <comment>Status message for login fails result</comment>
-  </data>
-  <data name="Settings_User.Text" xml:space="preserve">
-    <value>User</value>
-    <comment>Settings section title for User</comment>
-  </data>
-  <data name="Settings_LogOut.Content" xml:space="preserve">
-    <value>Log out</value>
-    <comment>Settings LogOut user content</comment>
+  <data name="ShellMenuItem_File_Settings.Text" xml:space="preserve">
+    <value>Settings</value>
   </data>
 </root>

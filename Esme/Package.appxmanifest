@@ -2,27 +2,25 @@
 
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
-  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
-  xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   xmlns:genTemplate="http://schemas.microsoft.com/appx/developer/templatestudio"
-  IgnorableNamespaces="uap mp genTemplate uap5">
+  IgnorableNamespaces="uap rescap genTemplate">
 
   <Identity
-    Name="F473BA60-2E0A-4578-8F7F-13A95026AE0A"
+    Name="Esmerelda"
     Publisher="CN=DeveloperWOW64"
     Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="F473BA60-2E0A-4578-8F7F-13A95026AE0A" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
-
   <Properties>
-    <DisplayName>Esme</DisplayName>
+    <DisplayName>Esmerelda</DisplayName>
     <PublisherDisplayName>DeveloperWOW64</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
   <Dependencies>
-    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
   </Dependencies>
 
   <Resources>
@@ -32,30 +30,22 @@
   <Applications>
     <Application Id="App"
       Executable="$targetnametoken$.exe"
-      EntryPoint="Esme.App">
+      EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="ms-resource:AppDisplayName"
+        DisplayName="Esmerelda"
+        Description="Esmerelda; the most complex and widely open-source artificially intelligent being to be on Windows."
+        BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
-        Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="ms-resource:AppDescription"
-        BackgroundColor="transparent">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
+        Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"  Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
+        <uap:LockScreen BadgeLogo="Assets\BadgeLogo.png" Notification="badge"/>
       </uap:VisualElements>
-
       <Extensions>
-          <uap5:Extension
-            Category="windows.appExecutionAlias"
-            Executable="Esme.exe"
-            EntryPoint="Esme.App">
-            <uap5:AppExecutionAlias>
-              <uap5:ExecutionAlias Alias="Esme.exe" />
-            </uap5:AppExecutionAlias>
-          </uap5:Extension>
         <uap:Extension Category="windows.protocol">
-          <uap:Protocol Name="wtsapp">
-            <uap:Logo>Assets\Icon.png</uap:Logo>
-            <uap:DisplayName>Esme</uap:DisplayName>
+          <uap:Protocol Name="esme">
+            <uap:Logo>Assets\StoreLogo.png</uap:Logo>
+            <uap:DisplayName>Esmerelda</uap:DisplayName>
           </uap:Protocol>
         </uap:Extension>
       </Extensions>
@@ -63,16 +53,15 @@
   </Applications>
 
   <Capabilities>
-    <Capability Name="internetClientServer" />
-    <Capability Name="internetClient" />
-    <DeviceCapability Name="location" />
+    <rescap:Capability Name="runFullTrust" />
   </Capabilities>
 
   <genTemplate:Metadata>
     <genTemplate:Item Name="generator" Value="Template Studio"/>
     <genTemplate:Item Name="wizardVersion" Version="v5.1" />
-    <genTemplate:Item Name="projectType" Value="Blank" />
+    <genTemplate:Item Name="projectType" Value="MenuBar" />
     <genTemplate:Item Name="framework" Value="MVVMToolkit" />
-    <genTemplate:Item Name="platform" Value="Uwp" />
+    <genTemplate:Item Name="platform" Value="WinUI" />
+    <genTemplate:Item Name="appmodel" Value="Desktop" />
   </genTemplate:Metadata>
 </Package>

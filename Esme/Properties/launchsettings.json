@@ -1,0 +1,10 @@
+﻿{
+    "profiles": {
+      "Esme (Package)": {
+        "commandName": "MsixPackage"
+      },
+      "Esme (Unpackaged)": {
+        "commandName": "Project"
+      }
+    }
+}

@@ -1,39 +1,32 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-using Esme.Services;
+using Esme.Contracts.Services;
+using Esme.ViewModels;
 
-using Windows.ApplicationModel.Activation;
+using Microsoft.UI.Xaml;
 
-namespace Esme.Activation
+namespace Esme.Activation;
+
+public class DefaultActivationHandler : ActivationHandler<LaunchActivatedEventArgs>
 {
-    internal class DefaultActivationHandler : ActivationHandler<IActivatedEventArgs>
+    private readonly INavigationService _navigationService;
+
+    public DefaultActivationHandler(INavigationService navigationService)
     {
-        private readonly Type _navElement;
+        _navigationService = navigationService;
+    }
 
-        public DefaultActivationHandler(Type navElement)
-        {
-            _navElement = navElement;
-        }
+    protected override bool CanHandleInternal(LaunchActivatedEventArgs args)
+    {
+        // None of the ActivationHandlers has handled the activation.
+        return _navigationService.Frame.Content == null;
+    }
 
-        protected override async Task HandleInternalAsync(IActivatedEventArgs args)
-        {
-            // When the navigation stack isn't restored, navigate to the first page and configure
-            // the new page by passing required information in the navigation parameter
-            object arguments = null;
-            if (args is LaunchActivatedEventArgs launchArgs)
-            {
-                arguments = launchArgs.Arguments;
-            }
+    protected async override Task HandleInternalAsync(LaunchActivatedEventArgs args)
+    {
+        _navigationService.NavigateTo(typeof(MainViewModel).FullName, args.Arguments);
 
-            NavigationService.Navigate(_navElement, arguments);
-            await Task.CompletedTask;
-        }
-
-        protected override bool CanHandleInternal(IActivatedEventArgs args)
-        {
-            // None of the ActivationHandlers has handled the app activation
-            return NavigationService.Frame.Content == null && _navElement != null;
-        }
+        await Task.CompletedTask;
     }
 }

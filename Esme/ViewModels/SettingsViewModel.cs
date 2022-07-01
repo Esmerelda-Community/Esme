@@ -1,118 +1,71 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 
-using Esme.Core.Helpers;
-using Esme.Core.Services;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+
+using Esme.Contracts.Services;
 using Esme.Helpers;
-using Esme.Services;
 
-using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
+using Microsoft.UI.Xaml;
 
 using Windows.ApplicationModel;
-using Windows.UI.Xaml;
 
-namespace Esme.ViewModels
+namespace Esme.ViewModels;
+
+public class SettingsViewModel : ObservableRecipient
 {
-    // TODO: Add other settings as necessary. For help see https://github.com/microsoft/TemplateStudio/blob/main/docs/UWP/pages/settings.md
-    public class SettingsViewModel : ObservableObject
+    private readonly IThemeSelectorService _themeSelectorService;
+    private ElementTheme _elementTheme;
+
+    public ElementTheme ElementTheme
     {
-        private UserDataService UserDataService => Singleton<UserDataService>.Instance;
+        get => _elementTheme;
+        set => SetProperty(ref _elementTheme, value);
+    }
 
-        private IdentityService IdentityService => Singleton<IdentityService>.Instance;
+    private string _versionDescription;
 
-        private ElementTheme _elementTheme = ThemeSelectorService.Theme;
+    public string VersionDescription
+    {
+        get => _versionDescription;
+        set => SetProperty(ref _versionDescription, value);
+    }
 
-        public ElementTheme ElementTheme
+    private ICommand _switchThemeCommand;
+
+    public ICommand SwitchThemeCommand
+    {
+        get
         {
-            get { return _elementTheme; }
-
-            set { SetProperty(ref _elementTheme, value); }
-        }
-
-        private string _versionDescription;
-
-        public string VersionDescription
-        {
-            get { return _versionDescription; }
-
-            set { SetProperty(ref _versionDescription, value); }
-        }
-
-        private ICommand _switchThemeCommand;
-
-        public ICommand SwitchThemeCommand
-        {
-            get
+            if (_switchThemeCommand == null)
             {
-                if (_switchThemeCommand == null)
-                {
-                    _switchThemeCommand = new RelayCommand<ElementTheme>(
-                        async (param) =>
+                _switchThemeCommand = new RelayCommand<ElementTheme>(
+                    async (param) =>
+                    {
+                        if (ElementTheme != param)
                         {
                             ElementTheme = param;
-                            await ThemeSelectorService.SetThemeAsync(param);
-                        });
-                }
-
-                return _switchThemeCommand;
+                            await _themeSelectorService.SetThemeAsync(param);
+                        }
+                    });
             }
+
+            return _switchThemeCommand;
         }
+    }
 
-        private UserViewModel _user;
+    public SettingsViewModel(IThemeSelectorService themeSelectorService)
+    {
+        _themeSelectorService = themeSelectorService;
+        _elementTheme = _themeSelectorService.Theme;
+        VersionDescription = GetVersionDescription();
+    }
 
-        private ICommand _logoutCommand;
+    private static string GetVersionDescription()
+    {
+        var appName = "AppDisplayName".GetLocalized();
+        var version = Package.Current.Id.Version;
 
-        public ICommand LogoutCommand => _logoutCommand ?? (_logoutCommand = new RelayCommand(OnLogout));
-
-        public UserViewModel User
-        {
-            get { return _user; }
-            set { SetProperty(ref _user, value); }
-        }
-
-        public SettingsViewModel()
-        {
-        }
-
-        public async Task InitializeAsync()
-        {
-            VersionDescription = GetVersionDescription();
-            IdentityService.LoggedOut += OnLoggedOut;
-            UserDataService.UserDataUpdated += OnUserDataUpdated;
-            User = await UserDataService.GetUserAsync();
-        }
-
-        private string GetVersionDescription()
-        {
-            var appName = "AppDisplayName".GetLocalized();
-            var package = Package.Current;
-            var packageId = package.Id;
-            var version = packageId.Version;
-
-            return $"{appName} - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
-        }
-
-        public void UnregisterEvents()
-        {
-            IdentityService.LoggedOut -= OnLoggedOut;
-            UserDataService.UserDataUpdated -= OnUserDataUpdated;
-        }
-
-        private void OnUserDataUpdated(object sender, UserViewModel userData)
-        {
-            User = userData;
-        }
-
-        private async void OnLogout()
-        {
-            await IdentityService.LogoutAsync();
-        }
-
-        private void OnLoggedOut(object sender, EventArgs e)
-        {
-            UnregisterEvents();
-        }
+        return $"{appName} - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
     }
 }

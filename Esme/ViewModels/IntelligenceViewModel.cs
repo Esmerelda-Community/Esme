@@ -1,13 +1,10 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-using Microsoft.Toolkit.Mvvm.ComponentModel;
+namespace Esme.ViewModels;
 
-namespace Esme.ViewModels
+public class IntelligenceViewModel : ObservableRecipient
 {
-    public class IntelligenceViewModel : ObservableObject
+    public IntelligenceViewModel()
     {
-        public IntelligenceViewModel()
-        {
-        }
     }
 }

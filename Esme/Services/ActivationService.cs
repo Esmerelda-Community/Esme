@@ -1,178 +1,76 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 using Esme.Activation;
-using Esme.Core.Helpers;
-using Esme.Core.Services;
+using Esme.Contracts.Services;
+using Esme.Views;
 
-using Windows.ApplicationModel.Activation;
-using Windows.System;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 
-namespace Esme.Services
+namespace Esme.Services;
+
+public class ActivationService : IActivationService
 {
-    // For more information on understanding and extending activation flow see
-    // https://github.com/microsoft/TemplateStudio/blob/main/docs/UWP/activation.md
-    internal class ActivationService
+    private readonly ActivationHandler<LaunchActivatedEventArgs> _defaultHandler;
+    private readonly IEnumerable<IActivationHandler> _activationHandlers;
+    private readonly IThemeSelectorService _themeSelectorService;
+    private UIElement _shell = null;
+
+    public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, IEnumerable<IActivationHandler> activationHandlers, IThemeSelectorService themeSelectorService)
     {
-        private readonly App _app;
-        private readonly Type _defaultNavItem;
-        private Lazy<UIElement> _shell;
+        _defaultHandler = defaultHandler;
+        _activationHandlers = activationHandlers;
+        _themeSelectorService = themeSelectorService;
+    }
 
-        private object _lastActivationArgs;
+    public async Task ActivateAsync(object activationArgs)
+    {
+        // Execute tasks before activation.
+        await InitializeAsync();
 
-        private IdentityService IdentityService => Singleton<IdentityService>.Instance;
-
-        private UserDataService UserDataService => Singleton<UserDataService>.Instance;
-
-        public static readonly KeyboardAccelerator AltLeftKeyboardAccelerator = BuildKeyboardAccelerator(VirtualKey.Left, VirtualKeyModifiers.Menu);
-
-        public static readonly KeyboardAccelerator BackKeyboardAccelerator = BuildKeyboardAccelerator(VirtualKey.GoBack);
-
-        public ActivationService(App app, Type defaultNavItem, Lazy<UIElement> shell = null)
+        // Set the MainWindow Content.
+        if (App.MainWindow.Content == null)
         {
-            _app = app;
-            _shell = shell;
-            _defaultNavItem = defaultNavItem;
-            IdentityService.LoggedIn += OnLoggedIn;
+            _shell = App.GetService<ShellPage>();
+            App.MainWindow.Content = _shell ?? new Frame();
         }
 
-        public async Task ActivateAsync(object activationArgs)
+        // Handle activation via ActivationHandlers.
+        await HandleActivationAsync(activationArgs);
+
+        // Activate the MainWindow.
+        App.MainWindow.Activate();
+
+        // Execute tasks after activation.
+        await StartupAsync();
+    }
+
+    private async Task HandleActivationAsync(object activationArgs)
+    {
+        var activationHandler = _activationHandlers.FirstOrDefault(h => h.CanHandle(activationArgs));
+
+        if (activationHandler != null)
         {
-            if (IsInteractive(activationArgs))
-            {
-                // Initialize services that you need before app activation
-                // take into account that the splash screen is shown while this code runs.
-                await InitializeAsync();
-                UserDataService.Initialize();
-                IdentityService.InitializeWithAadAndPersonalMsAccounts();
-                var silentLoginSuccess = await IdentityService.AcquireTokenSilentAsync();
-                if (!silentLoginSuccess || !IdentityService.IsAuthorized())
-                {
-                    await RedirectLoginPageAsync();
-                }
-
-                // Do not repeat app initialization when the Window already has content,
-                // just ensure that the window is active
-                if (Window.Current.Content == null)
-                {
-                    // Create a Shell or Frame to act as the navigation context
-                    Window.Current.Content = _shell?.Value ?? new Frame();
-                    NavigationService.NavigationFailed += (sender, e) =>
-                    {
-                        throw e.Exception;
-                    };
-                }
-            }
-
-            // Depending on activationArgs one of ActivationHandlers or DefaultActivationHandler
-            // will navigate to the first page
-            if (IdentityService.IsLoggedIn())
-            {
-                await HandleActivationAsync(activationArgs);
-            }
-
-            _lastActivationArgs = activationArgs;
-
-            if (IsInteractive(activationArgs))
-            {
-                // Ensure the current window is active
-                Window.Current.Activate();
-
-                // Tasks after activation
-                await StartupAsync();
-            }
+            await activationHandler.HandleAsync(activationArgs);
         }
 
-        private async void OnLoggedIn(object sender, EventArgs e)
+        if (_defaultHandler.CanHandle(activationArgs))
         {
-            if (_shell?.Value != null)
-            {
-                Window.Current.Content = _shell.Value;
-            }
-            else
-            {
-                var frame = new Frame();
-                Window.Current.Content = frame;
-                NavigationService.Frame = frame;
-            }
-
-            await ThemeSelectorService.SetRequestedThemeAsync();
-            await HandleActivationAsync(_lastActivationArgs);
+            await _defaultHandler.HandleAsync(activationArgs);
         }
+    }
 
-        private static KeyboardAccelerator BuildKeyboardAccelerator(VirtualKey key, VirtualKeyModifiers? modifiers = null)
-        {
-            var keyboardAccelerator = new KeyboardAccelerator() { Key = key };
-            if (modifiers.HasValue)
-            {
-                keyboardAccelerator.Modifiers = modifiers.Value;
-            }
+    private async Task InitializeAsync()
+    {
+        await _themeSelectorService.InitializeAsync().ConfigureAwait(false);
+        await Task.CompletedTask;
+    }
 
-            keyboardAccelerator.Invoked += OnKeyboardAcceleratorInvoked;
-            return keyboardAccelerator;
-        }
-
-        private static void OnKeyboardAcceleratorInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
-        {
-            var result = NavigationService.GoBack();
-            args.Handled = result;
-        }
-
-        private async Task InitializeAsync()
-        {
-            await ThemeSelectorService.InitializeAsync().ConfigureAwait(false);
-            await WindowManagerService.Current.InitializeAsync();
-        }
-
-        private async Task HandleActivationAsync(object activationArgs)
-        {
-            var activationHandler = GetActivationHandlers()
-                                                .FirstOrDefault(h => h.CanHandle(activationArgs));
-
-            if (activationHandler != null)
-            {
-                await activationHandler.HandleAsync(activationArgs);
-            }
-
-            if (IsInteractive(activationArgs))
-            {
-                var defaultHandler = new DefaultActivationHandler(_defaultNavItem);
-                if (defaultHandler.CanHandle(activationArgs))
-                {
-                    await defaultHandler.HandleAsync(activationArgs);
-                }
-            }
-        }
-
-        private async Task StartupAsync()
-        {
-            await ThemeSelectorService.SetRequestedThemeAsync();
-            await WhatsNewDisplayService.ShowIfAppropriateAsync();
-        }
-
-        private IEnumerable<ActivationHandler> GetActivationHandlers()
-        {
-            yield return Singleton<SchemeActivationHandler>.Instance;
-            yield return Singleton<CommandLineActivationHandler>.Instance;
-        }
-
-        private bool IsInteractive(object args)
-        {
-            return args is IActivatedEventArgs;
-        }
-
-        public async Task RedirectLoginPageAsync()
-        {
-            var frame = new Frame();
-            NavigationService.Frame = frame;
-            Window.Current.Content = frame;
-            await ThemeSelectorService.SetRequestedThemeAsync();
-            NavigationService.Navigate<Views.LogInPage>();
-        }
+    private async Task StartupAsync()
+    {
+        await _themeSelectorService.SetRequestedThemeAsync();
+        await Task.CompletedTask;
     }
 }

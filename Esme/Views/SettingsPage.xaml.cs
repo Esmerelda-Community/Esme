@@ -1,31 +1,20 @@
-﻿using System;
+﻿using Esme.ViewModels;
 
-using Esme.ViewModels;
+using Microsoft.UI.Xaml.Controls;
 
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Navigation;
+namespace Esme.Views;
 
-namespace Esme.Views
+// TODO: Set the URL for your privacy policy by updating SettingsPage_PrivacyTermsLink.NavigateUri in Resources.resw.
+public sealed partial class SettingsPage : Page
 {
-    // TODO: Change the URL for your privacy policy in the Resource File, currently set to https://YourPrivacyUrlGoesHere
-    public sealed partial class SettingsPage : Page
+    public SettingsViewModel ViewModel
     {
-        public SettingsViewModel ViewModel { get; } = new SettingsViewModel();
+        get;
+    }
 
-        public SettingsPage()
-        {
-            InitializeComponent();
-        }
-
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
-        {
-            await ViewModel.InitializeAsync();
-        }
-
-        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
-        {
-            base.OnNavigatingFrom(e);
-            ViewModel.UnregisterEvents();
-        }
+    public SettingsPage()
+    {
+        ViewModel = App.GetService<SettingsViewModel>();
+        InitializeComponent();
     }
 }

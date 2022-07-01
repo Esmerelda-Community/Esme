@@ -1,38 +1,40 @@
 ﻿using System;
 
-using Windows.UI.Xaml.Data;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Data;
 
-namespace Esme.Helpers
+namespace Esme.Helpers;
+
+public class EnumToBooleanConverter : IValueConverter
 {
-    public class EnumToBooleanConverter : IValueConverter
+    public EnumToBooleanConverter()
     {
-        public Type EnumType { get; set; }
+    }
 
-        public object Convert(object value, Type targetType, object parameter, string language)
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (parameter is string enumString)
         {
-            if (parameter is string enumString)
+            if (!Enum.IsDefined(typeof(ElementTheme), value))
             {
-                if (!Enum.IsDefined(EnumType, value))
-                {
-                    throw new ArgumentException("value must be an Enum!");
-                }
-
-                var enumValue = Enum.Parse(EnumType, enumString);
-
-                return enumValue.Equals(value);
+                throw new ArgumentException("ExceptionEnumToBooleanConverterValueMustBeAnEnum");
             }
 
-            throw new ArgumentException("parameter must be an Enum name!");
+            var enumValue = Enum.Parse(typeof(ElementTheme), enumString);
+
+            return enumValue.Equals(value);
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        throw new ArgumentException("ExceptionEnumToBooleanConverterParameterMustBeAnEnumName");
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        if (parameter is string enumString)
         {
-            if (parameter is string enumString)
-            {
-                return Enum.Parse(EnumType, enumString);
-            }
-
-            throw new ArgumentException("parameter must be an Enum name!");
+            return Enum.Parse(typeof(ElementTheme), enumString);
         }
+
+        throw new ArgumentException("ExceptionEnumToBooleanConverterParameterMustBeAnEnumName");
     }
 }

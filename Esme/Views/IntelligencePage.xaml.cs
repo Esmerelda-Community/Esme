@@ -1,18 +1,19 @@
-﻿using System;
+﻿using Esme.ViewModels;
 
-using Esme.ViewModels;
+using Microsoft.UI.Xaml.Controls;
 
-using Windows.UI.Xaml.Controls;
+namespace Esme.Views;
 
-namespace Esme.Views
+public sealed partial class IntelligencePage : Page
 {
-    public sealed partial class IntelligencePage : Page
+    public IntelligenceViewModel ViewModel
     {
-        public IntelligenceViewModel ViewModel { get; } = new IntelligenceViewModel();
+        get;
+    }
 
-        public IntelligencePage()
-        {
-            InitializeComponent();
-        }
+    public IntelligencePage()
+    {
+        ViewModel = App.GetService<IntelligenceViewModel>();
+        InitializeComponent();
     }
 }

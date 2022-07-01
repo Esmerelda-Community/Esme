@@ -1,69 +1,85 @@
-﻿using System;
-
-using Esme.Core.Helpers;
+﻿using Esme.Activation;
+using Esme.Contracts.Services;
+using Esme.Core.Contracts.Services;
 using Esme.Core.Services;
+using Esme.Helpers;
+using Esme.Models;
 using Esme.Services;
+using Esme.ViewModels;
+using Esme.Views;
 
-using Microsoft.AppCenter;
-using Microsoft.AppCenter.Analytics;
-using Microsoft.AppCenter.Crashes;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.UI.Xaml;
 
-using Windows.ApplicationModel.Activation;
-using Windows.UI.Xaml;
+// To learn more about WinUI3, see: https://docs.microsoft.com/windows/apps/winui/winui3/.
+namespace Esme;
 
-namespace Esme
+public partial class App : Application
 {
-    public sealed partial class App : Application
+    // The .NET Generic Host provides dependency injection, configuration, logging, and other services.
+    // https://docs.microsoft.com/dotnet/core/extensions/generic-host
+    // https://docs.microsoft.com/dotnet/core/extensions/dependency-injection
+    // https://docs.microsoft.com/dotnet/core/extensions/configuration
+    // https://docs.microsoft.com/dotnet/core/extensions/logging
+    private static readonly IHost _host = Host
+        .CreateDefaultBuilder()
+        .ConfigureServices((context, services) =>
+        {
+            // Default Activation Handler
+            services.AddTransient<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();
+
+            // Other Activation Handlers
+
+            // Services
+            services.AddSingleton<ILocalSettingsService, LocalSettingsServicePackaged>();
+            services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
+            services.AddSingleton<IActivationService, ActivationService>();
+            services.AddSingleton<IPageService, PageService>();
+            services.AddSingleton<INavigationService, NavigationService>();
+
+            // Core Services
+            services.AddSingleton<IFileService, FileService>();
+
+            // Views and ViewModels
+            services.AddTransient<SettingsViewModel>();
+            services.AddTransient<SettingsPage>();
+            services.AddTransient<IntelligenceViewModel>();
+            services.AddTransient<IntelligencePage>();
+            services.AddTransient<MainViewModel>();
+            services.AddTransient<MainPage>();
+            services.AddTransient<ShellPage>();
+            services.AddTransient<ShellViewModel>();
+
+            // Configuration
+            services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
+        })
+        .Build();
+
+    public static T GetService<T>()
+        where T : class
     {
-        private IdentityService IdentityService => Singleton<IdentityService>.Instance;
+        return _host.Services.GetService(typeof(T)) as T;
+    }
 
-        private Lazy<ActivationService> _activationService;
+    public static Window MainWindow { get; set; } = new Window() { Title = "AppDisplayName".GetLocalized() };
 
-        private ActivationService ActivationService
-        {
-            get { return _activationService.Value; }
-        }
+    public App()
+    {
+        InitializeComponent();
+        UnhandledException += App_UnhandledException;
+    }
 
-        public App()
-        {
-            InitializeComponent();
+    private void App_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        // TODO: Log and handle exceptions as appropriate.
+        // For more details, see https://docs.microsoft.com/windows/winui/api/microsoft.ui.xaml.unhandledexceptioneventargs.
+    }
 
-            // TODO: Add your app in the app center and set your secret here. More at https://docs.microsoft.com/appcenter/sdk/getting-started/uwp
-            AppCenter.Start("{Your App Secret}", typeof(Analytics), typeof(Crashes));
-            UnhandledException += OnAppUnhandledException;
-
-            // Deferred execution until used. Check https://docs.microsoft.com/dotnet/api/system.lazy-1 for further info on Lazy<T> class.
-            _activationService = new Lazy<ActivationService>(CreateActivationService);
-            IdentityService.LoggedOut += OnLoggedOut;
-        }
-
-        protected override async void OnLaunched(LaunchActivatedEventArgs args)
-        {
-            if (!args.PrelaunchActivated)
-            {
-                await ActivationService.ActivateAsync(args);
-            }
-        }
-
-        protected override async void OnActivated(IActivatedEventArgs args)
-        {
-            await ActivationService.ActivateAsync(args);
-        }
-
-        private void OnAppUnhandledException(object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e)
-        {
-            // TODO: Please log and handle the exception as appropriate to your scenario
-            // For more info see https://docs.microsoft.com/uwp/api/windows.ui.xaml.application.unhandledexception
-        }
-
-        private ActivationService CreateActivationService()
-        {
-            return new ActivationService(this, typeof(Views.MainPage));
-        }
-
-        private async void OnLoggedOut(object sender, EventArgs e)
-        {
-            await ActivationService.RedirectLoginPageAsync();
-        }
+    protected async override void OnLaunched(LaunchActivatedEventArgs args)
+    {
+        base.OnLaunched(args);
+        var activationService = App.GetService<IActivationService>();
+        await activationService.ActivateAsync(args);
     }
 }

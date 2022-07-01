@@ -1,18 +1,24 @@
-﻿using System;
+﻿using Esme.ViewModels;
 
-using Esme.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Imaging;
+using Microsoft.UI.Xaml.Navigation;
 
-using Windows.UI.Xaml.Controls;
+namespace Esme.Views;
 
-namespace Esme.Views
+public sealed partial class MainPage : Page
 {
-    public sealed partial class MainPage : Page
+    public MainViewModel ViewModel
     {
-        public MainViewModel ViewModel { get; } = new MainViewModel();
+        get;
+    }
 
-        public MainPage()
-        {
-            InitializeComponent();
-        }
+    public MainPage()
+    {
+        ViewModel = App.GetService<MainViewModel>();
+        InitializeComponent();
     }
 }
